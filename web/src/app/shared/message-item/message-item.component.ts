@@ -15,8 +15,8 @@ import type { ChatMessage } from '@core/api';
   },
 })
 export class MessageItemComponent {
-  message = input.required<ChatMessage>();
-  index = input.required<number>();
+  public message = input.required<ChatMessage>();
+  public index = input.required<number>();
 
   protected reasoning = computed(() => {
     const message = this.message();

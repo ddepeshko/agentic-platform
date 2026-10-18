@@ -13,7 +13,7 @@ export class AgentService {
         private readonly conversations: ConversationStore,
     ) {}
 
-    getPlayground(): PlaygroundResponseDto {
+    public getPlayground(): PlaygroundResponseDto {
         return {
             model: this.llm.model,
             tools: weatherTools,
@@ -22,7 +22,7 @@ export class AgentService {
 
     // Клієнт надсилає лише текст. Ролі, system prompt і історію визначає бекенд,
     // тож підробити інструкції, відповіді моделі чи результати тулів з клієнта не вийде.
-    async chat({ conversationId, message, useTools }: ChatRequestDto): Promise<ChatResponseDto> {
+    public async chat({ conversationId, message, useTools }: ChatRequestDto): Promise<ChatResponseDto> {
         const id =
             conversationId && this.conversations.has(conversationId)
                 ? conversationId

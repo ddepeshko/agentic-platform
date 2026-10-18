@@ -34,6 +34,10 @@ src/
 - Класи: `AgentModule`, `AgentController`, `AgentService`, `LlmService`.
 - Імпорти з розширенням `.js` (Nest 12 — ESM, `node` запускає `dist/`).
 
+## Модифікатори доступу
+
+- Кожен член класу має явний модифікатор доступу: `public`, `protected` або `private` (поля, методи, геттери, сигнали, `input()`). `public` пишемо явно. Порядок: декоратори → модифікатор доступу → `static` / `readonly` / `override` / `async` / `get`. Конструктор без модифікатора; параметри конструктора — `private readonly`.
+
 ## Типи
 
 - `interface` замість `type`, кожен у своєму файлі, експорт через barrel (`index.ts`).

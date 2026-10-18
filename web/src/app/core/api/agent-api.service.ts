@@ -7,11 +7,11 @@ import type { ChatRequest, ChatResponse, PlaygroundConfig } from './models';
 export class AgentApiService {
   private readonly http = inject(HttpClient);
 
-  playgroundResource() {
+  public playgroundResource() {
     return httpResource<PlaygroundConfig>(() => '/api/playground');
   }
 
-  chat(request: ChatRequest): Observable<ChatResponse> {
+  public chat(request: ChatRequest): Observable<ChatResponse> {
     return this.http.post<ChatResponse>('/api/chat', request);
   }
 }

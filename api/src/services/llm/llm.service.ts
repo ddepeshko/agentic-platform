@@ -12,11 +12,11 @@ export class LlmService {
         this.client = new OpenAI({ apiKey: config.apiKey, baseURL: config.baseURL });
     }
 
-    get model(): string {
+    public get model(): string {
         return this.config.model;
     }
 
-    async complete(messages: ChatMessage[], tools?: ToolDefinition[]): Promise<CompletionResult> {
+    public async complete(messages: ChatMessage[], tools?: ToolDefinition[]): Promise<CompletionResult> {
         const startedAt = Date.now();
 
         const response = await this.client.chat.completions.create({

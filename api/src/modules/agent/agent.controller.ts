@@ -11,13 +11,13 @@ export class AgentController {
     constructor(private readonly agentService: AgentService) {}
 
     @Get('playground')
-    getPlayground(): PlaygroundResponseDto {
+    public getPlayground(): PlaygroundResponseDto {
         return this.agentService.getPlayground();
     }
 
     @Post('chat')
     @HttpCode(HttpStatus.OK)
-    chat(@Body() body: ChatRequestDto): Promise<ChatResponseDto> {
+    public chat(@Body() body: ChatRequestDto): Promise<ChatResponseDto> {
         return this.agentService.chat(body);
     }
 }

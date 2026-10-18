@@ -10,24 +10,24 @@ import type { ChatSettings } from '../models';
 export class PlaygroundContextService {
   private api = inject(AgentApiService);
 
-  config = this.api.playgroundResource();
-  model = computed(() => (this.config.hasValue() ? this.config.value().model : ''));
-  tools = computed(() => (this.config.hasValue() ? this.config.value().tools : []));
+  public config = this.api.playgroundResource();
+  public model = computed(() => (this.config.hasValue() ? this.config.value().model : ''));
+  public tools = computed(() => (this.config.hasValue() ? this.config.value().tools : []));
 
-  settings = signal<ChatSettings>({ useTools: true });
+  public settings = signal<ChatSettings>({ useTools: true });
 
   // Історію тримає бекенд; тут лише її копія для відображення
-  conversationId = signal<string | undefined>(undefined);
-  messages = signal<ChatMessage[]>([]);
-  pendingText = signal('');
-  lastResult = signal<ChatResponse | null>(null);
-  loading = signal(false);
-  error = signal('');
+  public conversationId = signal<string | undefined>(undefined);
+  public messages = signal<ChatMessage[]>([]);
+  public pendingText = signal('');
+  public lastResult = signal<ChatResponse | null>(null);
+  public loading = signal(false);
+  public error = signal('');
 
-  waitingForTool = computed(() => this.lastResult()?.finishReason === 'tool_calls');
-  canSend = computed(() => !this.loading() && !this.waitingForTool());
+  public waitingForTool = computed(() => this.lastResult()?.finishReason === 'tool_calls');
+  public canSend = computed(() => !this.loading() && !this.waitingForTool());
 
-  async send(text: string) {
+  public async send(text: string) {
     this.pendingText.set(text);
     this.loading.set(true);
     this.error.set('');
@@ -52,7 +52,7 @@ export class PlaygroundContextService {
     }
   }
 
-  reset() {
+  public reset() {
     this.conversationId.set(undefined);
     this.messages.set([]);
     this.lastResult.set(null);
