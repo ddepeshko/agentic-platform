@@ -1,5 +1,9 @@
 You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
 
+**Правила проєкту:** [SETTINGS.md](SETTINGS.md) — вони мають пріоритет над рекомендаціями нижче.
+
+@SETTINGS.md
+
 ## TypeScript Best Practices
 
 - Use strict type checking
@@ -16,10 +20,6 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Do NOT use the `@HostBinding` and `@HostListener` decorators. Put host bindings inside the `host` object of the `@Component` or `@Directive` decorator instead
 - Use `NgOptimizedImage` for all static images.
   - `NgOptimizedImage` does not work for inline base64 images.
-
-## Accessibility
-
-- Do NOT add `aria-*` attributes to templates (project owner preference).
 
 ## Components
 
