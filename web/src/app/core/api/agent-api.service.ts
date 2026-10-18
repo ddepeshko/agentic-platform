@@ -1,7 +1,7 @@
 import { HttpClient, httpResource } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
 import type { Observable } from 'rxjs';
-import type { ChatMessage, CompletionResult, PlaygroundConfig } from './models';
+import type { ChatRequest, ChatResponse, PlaygroundConfig } from './models';
 
 @Service()
 export class AgentApiService {
@@ -11,7 +11,7 @@ export class AgentApiService {
     return httpResource<PlaygroundConfig>(() => '/api/playground');
   }
 
-  chat(messages: ChatMessage[], useTools: boolean): Observable<CompletionResult> {
-    return this.http.post<CompletionResult>('/api/chat', { messages, useTools });
+  chat(request: ChatRequest): Observable<ChatResponse> {
+    return this.http.post<ChatResponse>('/api/chat', request);
   }
 }

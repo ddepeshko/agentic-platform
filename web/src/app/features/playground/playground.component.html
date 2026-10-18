@@ -22,22 +22,25 @@
       <ol class="messages">
         @for (message of session.messages(); track $index) {
           <li><app-message-item [message]="message" [index]="$index" /></li>
-        } @empty {
+        }
+        @if (session.pendingText(); as text) {
+          <li class="pending">{{ text }}</li>
+        } @else if (session.messages().length === 0) {
           <li class="empty">Спитай, наприклад: «Яка погода в Ополе?»</li>
         }
       </ol>
 
       @if (session.waitingForTool()) {
-        <div class="notice" role="status">
+        <div class="notice">
           <span>
             Модель просить викликати тул (<code>tool_calls</code>). Виконання тулів — урок 1.3.
           </span>
-          <button matButton (click)="session.removeLastStep()">Прибрати крок</button>
+          <button matButton (click)="session.reset()">Нова розмова</button>
         </div>
       }
 
       @if (session.error(); as message) {
-        <div class="notice notice--error" role="alert">{{ message }}</div>
+        <div class="notice notice--error">{{ message }}</div>
       }
 
       <app-chat-composer

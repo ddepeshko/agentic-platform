@@ -1,6 +1,7 @@
 export type { AssistantMessage } from './assistant-message';
 export type { ChatMessage } from './chat-message';
-export type { CompletionResult } from './completion-result';
+export type { ChatRequest } from './chat-request';
+export type { ChatResponse } from './chat-response';
 export type { PlaygroundConfig } from './playground-config';
 export type { SystemMessage } from './system-message';
 export type { ToolCall } from './tool-call';

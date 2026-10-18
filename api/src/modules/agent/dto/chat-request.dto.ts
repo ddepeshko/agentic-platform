@@ -1,6 +1,5 @@
-import type { ChatMessage } from '../../../common/interfaces/index.js';
-
 export interface ChatRequestDto {
-    messages: ChatMessage[];
+    conversationId?: string;
+    message: string;
     useTools?: boolean;
 }

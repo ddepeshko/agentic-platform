@@ -1,6 +1,6 @@
 import { JsonPipe } from '@angular/common';
 import { Component, input } from '@angular/core';
-import type { ChatMessage, CompletionResult } from '@core/api';
+import type { ChatMessage, ChatResponse } from '@core/api';
 
 @Component({
   selector: 'app-conversation-inspector',
@@ -62,5 +62,5 @@ import type { ChatMessage, CompletionResult } from '@core/api';
 })
 export class ConversationInspectorComponent {
   readonly messages = input.required<readonly ChatMessage[]>();
-  readonly lastResult = input<CompletionResult | null>(null);
+  readonly lastResult = input<ChatResponse | null>(null);
 }

@@ -1,4 +1,4 @@
-import { Component, inject, linkedSignal, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIcon } from '@angular/material/icon';
@@ -38,10 +38,7 @@ export class PlaygroundComponent {
   protected session = inject(ChatSessionService);
   protected config = inject(AgentApiService);
   protected playground = this.config.playgroundResource();
-  protected settings = linkedSignal<ChatSettings>(() => ({
-    systemPrompt: this.playground.hasValue() ? this.playground.value().systemPrompt : '',
-    useTools: true,
-  }));
+  protected settings = signal<ChatSettings>({ useTools: true });
 
   protected inspectorOpen = signal(true);
 }

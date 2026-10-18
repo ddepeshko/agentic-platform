@@ -79,3 +79,14 @@ mat-sidenav {
   background: var(--mat-sys-error-container);
   color: var(--mat-sys-on-error-container);
 }
+
+.pending {
+  align-self: flex-end;
+  max-width: 80%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+  opacity: 0.7;
+  white-space: pre-wrap;
+}

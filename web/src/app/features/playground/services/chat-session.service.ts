@@ -1,47 +1,51 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { AgentApiService, type ChatMessage, type CompletionResult } from '@core/api';
+import { AgentApiService, type ChatMessage, type ChatResponse } from '@core/api';
 import type { ChatSettings } from '../models';
 
 @Injectable()
 export class ChatSessionService {
   private api = inject(AgentApiService);
 
+  // Історію тримає бекенд; тут лише її копія для відображення
+  conversationId = signal<string | undefined>(undefined);
   messages = signal<ChatMessage[]>([]);
-  lastResult = signal<CompletionResult | null>(null);
+  // Текст, що вже надіслано, але відповіді ще немає: показуємо його, поки модель думає
+  pendingText = signal('');
+  lastResult = signal<ChatResponse | null>(null);
   loading = signal(false);
   error = signal('');
 
-  // Модель попросила тул — продовжити зможемо, коли навчимося їх виконувати (урок 1.3)
   waitingForTool = computed(() => this.lastResult()?.finishReason === 'tool_calls');
 
   async send(text: string, settings: ChatSettings) {
-    if (this.messages().length === 0 && settings.systemPrompt) {
-      this.messages.set([{ role: 'system', content: settings.systemPrompt }]);
-    }
-    this.messages.update((list) => [...list, { role: 'user', content: text }]);
+    this.pendingText.set(text);
     this.loading.set(true);
     this.error.set('');
 
     try {
-      const result = await firstValueFrom(this.api.chat(this.messages(), settings.useTools));
+      const result = await firstValueFrom(
+        this.api.chat({
+          conversationId: this.conversationId(),
+          message: text,
+          useTools: settings.useTools,
+        }),
+      );
+      this.conversationId.set(result.conversationId);
+      this.messages.set(result.messages);
       this.lastResult.set(result);
-      this.messages.update((list) => [...list, result.message]);
     } catch (e) {
       const err = e as HttpErrorResponse;
       this.error.set(err.error?.message ?? err.message);
     } finally {
+      this.pendingText.set('');
       this.loading.set(false);
     }
   }
 
-  removeLastStep() {
-    this.messages.update((list) => list.slice(0, -1));
-    this.lastResult.set(null);
-  }
-
   reset() {
+    this.conversationId.set(undefined);
     this.messages.set([]);
     this.lastResult.set(null);
     this.error.set('');
