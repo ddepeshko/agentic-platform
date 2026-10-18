@@ -4,7 +4,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import type { ToolDefinition } from '@core/api';
-import type { ChatSettings } from '../chat-settings';
+import type { ChatSettings } from '../../models';
 
 @Component({
   selector: 'app-settings-panel',

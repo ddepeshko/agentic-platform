@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { AgentApiService, type ChatMessage, type CompletionResult } from '@core/api';
-import type { ChatSettings } from './chat-settings';
+import type { ChatSettings } from '../models';
 
 @Injectable()
 export class ChatSessionService {

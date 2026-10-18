@@ -8,11 +8,11 @@ import { MatToolbar } from '@angular/material/toolbar';
 import { MatTooltip } from '@angular/material/tooltip';
 import { AgentApiService } from '@core/api';
 import { MessageItemComponent } from '@shared/message-item/message-item.component';
-import { ChatComposerComponent } from './chat-composer/chat-composer.component';
-import { ChatSessionService } from './chat-session.service';
-import type { ChatSettings } from './chat-settings';
-import { ConversationInspectorComponent } from './conversation-inspector/conversation-inspector.component';
-import { SettingsPanelComponent } from './settings-panel/settings-panel.component';
+import { ChatComposerComponent } from './components/chat-composer/chat-composer.component';
+import { ChatSessionService } from './services/chat-session.service';
+import type { ChatSettings } from './models';
+import { ConversationInspectorComponent } from './components/conversation-inspector/conversation-inspector.component';
+import { SettingsPanelComponent } from './components/settings-panel/settings-panel.component';
 
 @Component({
   selector: 'app-playground',
@@ -36,11 +36,10 @@ import { SettingsPanelComponent } from './settings-panel/settings-panel.componen
 })
 export class PlaygroundComponent {
   protected session = inject(ChatSessionService);
-  protected config = inject(AgentApiService).playgroundResource();
-
-  // Дефолти з API; коли конфіг завантажиться, налаштування оновляться самі
+  protected config = inject(AgentApiService);
+  protected playground = this.config.playgroundResource();
   protected settings = linkedSignal<ChatSettings>(() => ({
-    systemPrompt: this.config.hasValue() ? this.config.value().systemPrompt : '',
+    systemPrompt: this.playground.hasValue() ? this.playground.value().systemPrompt : '',
     useTools: true,
   }));
 

@@ -11,7 +11,21 @@ src/app/
 └── features/<назва>/    ← сторінки; кожна вантажиться ліниво через роутер
 ```
 
-- Групуємо за фічами, а не за типом коду: папок `components/`, `services/` не робимо.
+- Верхній рівень `app/` групуємо за фічами, а не за типом коду.
+- Усередині фічі: сторінка (`<назва>.component.*`) у корені фічі, дочірні компоненти в `components/` (кожен у своїй папці), сервіси в `services/`, інтерфейси в `models/` (з barrel `index.ts`).
+
+```
+features/playground/
+├── playground.component.ts / .html / .scss
+├── components/
+│   ├── chat-composer/
+│   ├── settings-panel/
+│   └── conversation-inspector/
+├── services/chat-session.service.ts
+└── models/
+    ├── chat-settings.ts
+    └── index.ts
+```
 - `core` нічого не імпортує з `features`; фічі не імпортують одна одну.
 - Імпорти між шарами через аліаси `@core/*`, `@shared/*` (`tsconfig.json`).
 - Нова сторінка = папка в `features/` + рядок з `loadComponent` в `app.routes.ts`.

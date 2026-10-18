@@ -1,7 +1,7 @@
 <mat-toolbar>
   <h1>Agent Playground</h1>
-  @if (config.hasValue()) {
-    <span class="model">{{ config.value().model }}</span>
+  @if (playground.hasValue()) {
+    <span class="model">{{ playground.value().model }}</span>
   }
   <span class="spacer"></span>
   <button matIconButton matTooltip="Нова розмова" (click)="session.reset()">
@@ -55,7 +55,7 @@
         </mat-expansion-panel-header>
         <app-settings-panel
           [(settings)]="settings"
-          [tools]="config.hasValue() ? config.value().tools : []"
+          [tools]="playground.hasValue() ? playground.value().tools : []"
         />
       </mat-expansion-panel>
 
