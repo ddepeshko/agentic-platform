@@ -1,101 +1,54 @@
-:host {
-  display: block;
-  padding: 10px 14px;
-  border-radius: 12px;
-  background: var(--mat-sys-surface-container-low);
-  border-left: 4px solid var(--role-color);
+@use '@angular/material' as mat;
+
+:host(.message--user) {
+  @include mat.card-overrides(
+    (
+      outlined-container-color: var(--mat-sys-primary-container),
+      outlined-outline-color: var(--mat-sys-primary),
+    )
+  );
+}
+
+:host(.message--assistant) {
+  @include mat.card-overrides(
+    (
+      outlined-outline-color: var(--mat-sys-tertiary),
+    )
+  );
 }
 
 :host(.message--system) {
-  --role-color: var(--mat-sys-outline);
-}
-:host(.message--user) {
-  --role-color: var(--mat-sys-primary);
-  background: var(--mat-sys-primary-container);
-  color: var(--mat-sys-on-primary-container);
-}
-:host(.message--assistant) {
-  --role-color: var(--mat-sys-tertiary);
-}
-:host(.message--tool) {
-  --role-color: var(--mat-sys-secondary);
+  @include mat.card-overrides(
+    (
+      outlined-container-color: var(--mat-sys-surface-container),
+    )
+  );
 }
 
-.message__header {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: baseline;
-  margin-bottom: 4px;
-  font: var(--mat-sys-label-small);
-}
-
-.message__role {
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--role-color);
-}
-
-.message__meta {
-  color: var(--mat-sys-on-surface-variant);
-}
-
-.message__text {
+.text {
   margin: 0;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 
-.message__reasoning {
-  margin-bottom: 6px;
-  color: var(--mat-sys-on-surface-variant);
-  font: var(--mat-sys-body-small);
-
-  summary {
-    cursor: pointer;
-  }
+.reasoning {
+  margin-bottom: 8px;
 
   p {
-    margin: 6px 0 0;
+    margin: 0;
     white-space: pre-wrap;
     font-style: italic;
+    color: var(--mat-sys-on-surface-variant);
   }
 }
 
 .tool-call {
   margin-top: 8px;
-  padding: 8px 10px;
-  border-radius: 8px;
-  background: var(--mat-sys-secondary-container);
-  color: var(--mat-sys-on-secondary-container);
-}
 
-.tool-call__header {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-  font: var(--mat-sys-label-medium);
-
-  mat-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
+  pre {
+    margin: 6px 0 0;
+    font-size: 12px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
   }
-}
-
-.tool-call__id {
-  opacity: 0.7;
-}
-
-.tool-call__error {
-  margin: 6px 0 0;
-  color: var(--mat-sys-error);
-}
-
-.tool-call__args {
-  margin: 6px 0 0;
-  font-size: 12px;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
 }

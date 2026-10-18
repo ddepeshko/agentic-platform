@@ -21,7 +21,7 @@ features/playground/
 │   ├── chat-composer/
 │   ├── settings-panel/
 │   └── conversation-inspector/
-├── services/chat-session.service.ts
+├── services/playground-context.service.ts
 └── models/
     ├── chat-settings.ts
     └── index.ts
@@ -36,6 +36,14 @@ features/playground/
 - Компоненти: `chat-composer.component.ts` / `.html` / `.scss`, клас `ChatComposerComponent`.
 - Сервіси: `agent-api.service.ts`, клас `AgentApiService`.
 - Schematics в `angular.json` налаштовані так само, тож `ng g c` і `ng g s` одразу дають потрібні імена.
+- Логіка, шаблон і стилі в окремих файлах (`.ts` / `.html` / `.scss`), без inline `template` і `styles`. Виняток — кореневий `AppComponent` з одним `<router-outlet />`.
+
+## Стан фічі (контекст)
+
+- Стан і логіка сторінки — у сервісі-контексті без `providedIn` (`PlaygroundContextService`), який сторінка оголошує в `providers`. Дочірні компоненти фічі беруть його через `inject()` — без ланцюжків `input` / `output` (аналог React Context).
+- Не інжектимо в дітей сам клас батьківського компонента (циклічні імпорти).
+- Компоненти в `shared/` контекст не інжектять: вони презентаційні, працюють через `input()` / `output()`.
+- Коли контексту знадобляться параметри з шаблону (наприклад, `agentId` у модулі 4) — переходимо на `hostDirectives` з директивою-контекстом.
 
 ## Типи
 
@@ -47,7 +55,14 @@ features/playground/
 
 - Компоненти з Angular Material.
 - Кольори й шрифти з токенів теми `--mat-sys-*`, без власних кольорів.
-- Без `aria-*` атрибутів у шаблонах.
+- Без `aria-*` атрибутів і ARIA `role` у шаблонах.
+- Кастомізація Material-компонентів через `mat.<компонент>-overrides(...)`, а не перебиванням внутрішніх класів.
+
+## Форми
+
+- Поля вводу — через форми, а не читанням `event.target.value`.
+- Форми — **Signal Forms** (`form()`, `[formField]`, валідатори `required`, `pattern`...).
+- Надсилання й очищення — через `submit(form, async (f) => { ...; f().reset(initial) })`, а не прямим записом у модель в обробнику клавіші (інакше при швидкому набирі + Enter поле може не очиститись).
 
 ## Загальне
 

@@ -1,41 +1,17 @@
-import { Component, input, model } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { form, FormField } from '@angular/forms/signals';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatIcon } from '@angular/material/icon';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
-import type { ToolDefinition } from '@core/api';
-import type { ChatSettings } from '../../models';
+import { PlaygroundContextService } from '../../services/playground-context.service';
 
 @Component({
   selector: 'app-settings-panel',
-  imports: [FormField, MatSlideToggle],
-  template: `
-    <mat-slide-toggle [formField]="settingsForm.useTools">Передавати тули моделі</mat-slide-toggle>
-
-    @if (tools().length > 0) {
-      <p class="tools">
-        Тули:
-        @for (tool of tools(); track tool.function.name) {
-          <code>{{ tool.function.name }}</code>
-        }
-      </p>
-    }
-  `,
-  styles: `
-    :host {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .tools {
-      margin: 0;
-      color: var(--mat-sys-on-surface-variant);
-      font: var(--mat-sys-body-small);
-    }
-  `,
+  imports: [FormField, MatSlideToggle, MatChipsModule, MatIcon],
+  templateUrl: './settings-panel.component.html',
+  styleUrl: './settings-panel.component.scss',
 })
 export class SettingsPanelComponent {
-  readonly settings = model.required<ChatSettings>();
-  readonly tools = input<ToolDefinition[]>([]);
-
-  protected readonly settingsForm = form(this.settings);
+  protected context = inject(PlaygroundContextService);
+  protected settingsForm = form(this.context.settings);
 }

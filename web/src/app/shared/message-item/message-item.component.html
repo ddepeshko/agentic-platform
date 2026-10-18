@@ -1,26 +1,32 @@
-<header class="message__header">
-  <span class="message__role">{{ message().role }}</span>
-  <span class="message__meta">messages[{{ index() }}]</span>
-</header>
+<mat-card appearance="outlined">
+  <mat-card-header>
+    <mat-card-subtitle>{{ message().role }} · messages[{{ index() }}]</mat-card-subtitle>
+  </mat-card-header>
 
-@if (reasoning()) {
-  <details class="message__reasoning">
-    <summary>Роздуми моделі (reasoning)</summary>
-    <p>{{ reasoning() }}</p>
-  </details>
-}
+  <mat-card-content>
+    @if (reasoning()) {
+      <mat-expansion-panel class="reasoning">
+        <mat-expansion-panel-header>
+          <mat-panel-title>Роздуми моделі (reasoning)</mat-panel-title>
+        </mat-expansion-panel-header>
+        <p>{{ reasoning() }}</p>
+      </mat-expansion-panel>
+    }
 
-@if (message().content) {
-  <p class="message__text">{{ message().content }}</p>
-}
+    @if (message().content) {
+      <p class="text">{{ message().content }}</p>
+    }
 
-@for (call of toolCalls(); track call.id) {
-  <section class="tool-call">
-    <header class="tool-call__header">
-      <mat-icon>build</mat-icon>
-      <code>{{ call.function.name }}</code>
-      <span class="tool-call__id">{{ call.id }}</span>
-    </header>
-    <pre class="tool-call__args">{{ call.function.arguments }}</pre>
-  </section>
-}
+    @for (call of toolCalls(); track call.id) {
+      <div class="tool-call">
+        <mat-chip-set>
+          <mat-chip>
+            <mat-icon matChipAvatar>build</mat-icon>
+            {{ call.function.name }}
+          </mat-chip>
+        </mat-chip-set>
+        <pre>{{ call.function.arguments }}</pre>
+      </div>
+    }
+  </mat-card-content>
+</mat-card>

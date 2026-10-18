@@ -1,0 +1,20 @@
+@if (context.lastResult(); as result) {
+  <mat-list>
+    <mat-list-item>
+      <span matListItemTitle>{{ result.finishReason }}</span>
+      <span matListItemLine>finish_reason</span>
+    </mat-list-item>
+    <mat-list-item>
+      <span matListItemTitle>
+        {{ result.usage?.prompt_tokens ?? '—' }} / {{ result.usage?.completion_tokens ?? '—' }}
+      </span>
+      <span matListItemLine>prompt / completion tokens</span>
+    </mat-list-item>
+    <mat-list-item>
+      <span matListItemTitle>{{ result.durationMs }} мс</span>
+      <span matListItemLine>час відповіді</span>
+    </mat-list-item>
+  </mat-list>
+}
+
+<pre class="raw">{{ context.messages() | json }}</pre>

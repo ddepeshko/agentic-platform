@@ -1,46 +1,28 @@
 import { TextFieldModule } from '@angular/cdk/text-field';
-import { Component, ElementRef, input, output, signal, viewChild } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { form, FormField, pattern, required, submit } from '@angular/forms/signals';
 import { MatIconButton } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
+import { PlaygroundContextService } from '../../services/playground-context.service';
 
 @Component({
   selector: 'app-chat-composer',
-  imports: [MatFormFieldModule, MatInput, MatIconButton, MatIcon, TextFieldModule],
-  template: `
-    <form (submit)="$event.preventDefault(); submit()">
-      <mat-form-field appearance="outline" subscriptSizing="dynamic">
-        <mat-label>Повідомлення</mat-label>
-        <textarea
-          #textarea
-          matInput
-          cdkTextareaAutosize
-          cdkAutosizeMinRows="1"
-          cdkAutosizeMaxRows="6"
-          [value]="text()"
-          (input)="text.set(textarea.value)"
-          (keydown.enter)="onEnter($event)"
-        ></textarea>
-        <button matIconSuffix matIconButton type="submit" [disabled]="disabled() || !text().trim()">
-          <mat-icon>send</mat-icon>
-        </button>
-        <mat-hint>Enter — надіслати, Shift+Enter — новий рядок</mat-hint>
-      </mat-form-field>
-    </form>
-  `,
-  styles: `
-    mat-form-field {
-      width: 100%;
-    }
-  `,
+  imports: [FormField, MatFormFieldModule, MatInput, MatIconButton, MatIcon, TextFieldModule],
+  templateUrl: './chat-composer.component.html',
+  styleUrl: './chat-composer.component.scss',
 })
 export class ChatComposerComponent {
-  disabled = input(false);
-  send = output<string>();
+  private context = inject(PlaygroundContextService);
 
-  protected text = signal('');
-  private textarea = viewChild.required<ElementRef<HTMLTextAreaElement>>('textarea');
+  protected draft = signal({ text: '' });
+  protected draftForm = form(this.draft, (path) => {
+    required(path.text);
+    pattern(path.text, /\S/);
+  });
+
+  protected canSubmit = computed(() => this.context.canSend() && this.draftForm().valid());
 
   protected onEnter(event: Event) {
     if ((event as KeyboardEvent).shiftKey) return;
@@ -49,12 +31,12 @@ export class ChatComposerComponent {
   }
 
   protected submit() {
-    const text = this.text().trim();
-    if (this.disabled() || !text) return;
+    if (!this.canSubmit()) return;
 
-    this.send.emit(text);
-    this.text.set('');
-    // Якщо введення й Enter прийшли в одному кадрі, [value] ще не оновився — чистимо поле напряму
-    this.textarea().nativeElement.value = '';
+    submit(this.draftForm, async (form) => {
+      const text = form.text().value().trim();
+      form().reset({ text: '' });
+      await this.context.send(text);
+    });
   }
 }

@@ -1,10 +1,8 @@
 <mat-toolbar>
   <h1>Agent Playground</h1>
-  @if (playground.hasValue()) {
-    <span class="model">{{ playground.value().model }}</span>
-  }
+  <span class="model">{{ context.model() }}</span>
   <span class="spacer"></span>
-  <button matIconButton matTooltip="Нова розмова" (click)="session.reset()">
+  <button matIconButton matTooltip="Нова розмова" (click)="context.reset()">
     <mat-icon>add_comment</mat-icon>
   </button>
   <button matIconButton matTooltip="Інспектор" (click)="inspectorOpen.set(!inspectorOpen())">
@@ -12,7 +10,7 @@
   </button>
 </mat-toolbar>
 
-@if (session.loading()) {
+@if (context.loading()) {
   <mat-progress-bar mode="indeterminate" />
 }
 
@@ -20,33 +18,30 @@
   <mat-sidenav-content>
     <main class="chat">
       <ol class="messages">
-        @for (message of session.messages(); track $index) {
+        @for (message of context.messages(); track $index) {
           <li><app-message-item [message]="message" [index]="$index" /></li>
         }
-        @if (session.pendingText(); as text) {
+        @if (context.pendingText(); as text) {
           <li class="pending">{{ text }}</li>
-        } @else if (session.messages().length === 0) {
+        } @else if (context.messages().length === 0) {
           <li class="empty">Спитай, наприклад: «Яка погода в Ополе?»</li>
         }
       </ol>
 
-      @if (session.waitingForTool()) {
+      @if (context.waitingForTool()) {
         <div class="notice">
           <span>
             Модель просить викликати тул (<code>tool_calls</code>). Виконання тулів — урок 1.3.
           </span>
-          <button matButton (click)="session.reset()">Нова розмова</button>
+          <button matButton (click)="context.reset()">Нова розмова</button>
         </div>
       }
 
-      @if (session.error(); as message) {
+      @if (context.error(); as message) {
         <div class="notice notice--error">{{ message }}</div>
       }
 
-      <app-chat-composer
-        [disabled]="session.loading() || session.waitingForTool()"
-        (send)="session.send($event, settings())"
-      />
+      <app-chat-composer />
     </main>
   </mat-sidenav-content>
 
@@ -56,20 +51,14 @@
         <mat-expansion-panel-header>
           <mat-panel-title>Налаштування</mat-panel-title>
         </mat-expansion-panel-header>
-        <app-settings-panel
-          [(settings)]="settings"
-          [tools]="playground.hasValue() ? playground.value().tools : []"
-        />
+        <app-settings-panel />
       </mat-expansion-panel>
 
       <mat-expansion-panel expanded>
         <mat-expansion-panel-header>
-          <mat-panel-title>messages ({{ session.messages().length }})</mat-panel-title>
+          <mat-panel-title>messages ({{ context.messages().length }})</mat-panel-title>
         </mat-expansion-panel-header>
-        <app-conversation-inspector
-          [messages]="session.messages()"
-          [lastResult]="session.lastResult()"
-        />
+        <app-conversation-inspector />
       </mat-expansion-panel>
     </mat-accordion>
   </mat-sidenav>

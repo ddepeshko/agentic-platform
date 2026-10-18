@@ -1,0 +1,17 @@
+<form (submit)="$event.preventDefault(); submit()">
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label>Повідомлення</mat-label>
+    <textarea
+      matInput
+      [formField]="draftForm.text"
+      cdkTextareaAutosize
+      cdkAutosizeMinRows="1"
+      cdkAutosizeMaxRows="6"
+      (keydown.enter)="onEnter($event)"
+    ></textarea>
+    <button matIconSuffix matIconButton type="submit" [disabled]="!canSubmit()">
+      <mat-icon>send</mat-icon>
+    </button>
+    <mat-hint>Enter — надіслати, Shift+Enter — новий рядок</mat-hint>
+  </mat-form-field>
+</form>

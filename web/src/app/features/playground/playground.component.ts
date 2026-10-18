@@ -6,11 +6,9 @@ import { MatProgressBar } from '@angular/material/progress-bar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatTooltip } from '@angular/material/tooltip';
-import { AgentApiService } from '@core/api';
 import { MessageItemComponent } from '@shared/message-item/message-item.component';
 import { ChatComposerComponent } from './components/chat-composer/chat-composer.component';
-import { ChatSessionService } from './services/chat-session.service';
-import type { ChatSettings } from './models';
+import { PlaygroundContextService } from './services/playground-context.service';
 import { ConversationInspectorComponent } from './components/conversation-inspector/conversation-inspector.component';
 import { SettingsPanelComponent } from './components/settings-panel/settings-panel.component';
 
@@ -30,15 +28,12 @@ import { SettingsPanelComponent } from './components/settings-panel/settings-pan
     MatToolbar,
     MatTooltip,
   ],
-  providers: [ChatSessionService],
+  providers: [PlaygroundContextService],
   templateUrl: './playground.component.html',
   styleUrl: './playground.component.scss',
 })
 export class PlaygroundComponent {
-  protected session = inject(ChatSessionService);
-  protected config = inject(AgentApiService);
-  protected playground = this.config.playgroundResource();
-  protected settings = signal<ChatSettings>({ useTools: true });
+  protected context = inject(PlaygroundContextService);
 
   protected inspectorOpen = signal(true);
 }

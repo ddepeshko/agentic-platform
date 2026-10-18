@@ -4,22 +4,30 @@ import { firstValueFrom } from 'rxjs';
 import { AgentApiService, type ChatMessage, type ChatResponse } from '@core/api';
 import type { ChatSettings } from '../models';
 
+// Контекст сторінки playground (аналог React Context): PlaygroundComponent провайдить його,
+// а дочірні компоненти отримують той самий екземпляр через inject() — без input/output ланцюжків.
 @Injectable()
-export class ChatSessionService {
+export class PlaygroundContextService {
   private api = inject(AgentApiService);
+
+  config = this.api.playgroundResource();
+  model = computed(() => (this.config.hasValue() ? this.config.value().model : ''));
+  tools = computed(() => (this.config.hasValue() ? this.config.value().tools : []));
+
+  settings = signal<ChatSettings>({ useTools: true });
 
   // Історію тримає бекенд; тут лише її копія для відображення
   conversationId = signal<string | undefined>(undefined);
   messages = signal<ChatMessage[]>([]);
-  // Текст, що вже надіслано, але відповіді ще немає: показуємо його, поки модель думає
   pendingText = signal('');
   lastResult = signal<ChatResponse | null>(null);
   loading = signal(false);
   error = signal('');
 
   waitingForTool = computed(() => this.lastResult()?.finishReason === 'tool_calls');
+  canSend = computed(() => !this.loading() && !this.waitingForTool());
 
-  async send(text: string, settings: ChatSettings) {
+  async send(text: string) {
     this.pendingText.set(text);
     this.loading.set(true);
     this.error.set('');
@@ -29,7 +37,7 @@ export class ChatSessionService {
         this.api.chat({
           conversationId: this.conversationId(),
           message: text,
-          useTools: settings.useTools,
+          useTools: this.settings().useTools,
         }),
       );
       this.conversationId.set(result.conversationId);
