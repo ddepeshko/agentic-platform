@@ -45,3 +45,34 @@
 - **Межі продукту:** дві фази й список «НЕ робить», щоб проєкт мав кінець.
 
 **Далі:** модуль 1, agent loop з нуля.
+
+## Модуль 1. Agent loop
+
+### 2026-10-15 — 2026-10-18
+- **Урок 1.1 ✅** `src/playground/chat.ts`: чат у терміналі. Модель stateless, «пам'ять» = масив `messages`, який клієнт щоразу надсилає повністю.
+- **Урок 1.2 (в процесі)** `src/playground/weather-agent.ts`: один запит з тулом `get_weather`, модель повертає `tool_calls`.
+- **Рішення: основна модель для розробки — локальна `qwen3:8b` через Ollama** (`http://localhost:11434/v1`). Gemini free tier виявився замалим: 5 запитів/хв і 20/день на модель. Gemini лишається в `.env` закоментованим для порівняння. Код не змінився, лише `.env`.
+- Спостереження: Ollama віддає роздуми моделі в полі `reasoning`; маленька модель гірше тримає зону відповідальності («допоможу з іншими завданнями»).
+- **Рішення: веб-інтерфейс на Angular (`web/`), агент лишається в Node-бекенді.** Ключі, тули й agent loop ніколи не виконуються в браузері. Angular замінює Next.js з HANDOFF (модуль 12).
+- **Зроблено (ментор, на прохання користувача):** HTTP API на Fastify:
+  - `src/core/llm.ts`: клієнт моделі, незалежний від фреймворку й конфігу (налаштування передаються ззовні);
+  - `src/domain/weather/tools.ts`: тул `get_weather` + system prompt агента погоди;
+  - `src/platform/http/server.ts`: `GET /api/health`, `GET /api/playground`, `POST /api/chat` (stateless, клієнт надсилає всю історію);
+  - `src/server.ts`: composition root; скрипт `npm run api`; `API_PORT` у конфігу;
+  - `.nvmrc` = 22.23.1 (Angular 22 потребує Node ≥ 22.22.3; у VS Code стояла 22.15).
+- Спостереження: `qwen3:8b` дала для Ополе координати 51.15, 18.55 (насправді ≈ 50.67, 17.93, промах ~70 км) → тул геокодування обов'язковий.
+- **Інструменти:** підключено MCP Context7 (`.mcp.json`, scope project); правило №9 у `CLAUDE.md`: код з бібліотеками пишемо за актуальною документацією.
+- **Рішення: бекенд — NestJS 12 у `api/`** (скафолд через Nest CLI). Nest 12 повністю на ESM, імпорти з `.js` (NodeNext, бо `node` запускає `dist/`). `core/` і `domain/` переїхали в `api/src/` і лишаються звичайним TS без Nest. Fastify прибрано. `@nestjs/mau` (деплой у Nest Cloud) видалено: не потрібен і тягнув вразливості.
+  - Нюанс: npm 10.9 падає на встановленні Nest 12 (`edgesOut` bug), тому для `api/` використовуємо npm 11 (`npx npm@11 install`).
+- **Рішення: БД — MySQL** (вибір користувача). Ризик: векторний пошук для RAG (модуль 10) у MySQL Community обмежений; вирішимо в модулі 10 (окреме векторне сховище або інший підхід).
+- **Рішення: Zod лишається** для валідації (Nest 12: `@Body({ schema })` + `StandardSchemaValidationPipe`; `ConfigModule.forRoot({ validationSchema })`). Причина: та сама схема знадобиться для тулів (JSON Schema для моделі + перевірка аргументів).
+- **Рішення: увесь бекенд в `api/`, корінь — лише документація й скрипти-обгортки** (`npm run api`, `npm run chat`, `npm run agent`).
+  - `api/src/core` (клієнт моделі), `api/src/domain` (тул погоди) — звичайний TS без Nest;
+  - `api/src/agent` — Nest-модуль: `GET /api/playground`, `POST /api/chat` (Zod-валідація тіла, `LlmErrorFilter`: помилки моделі → той самий HTTP-статус, недоступна модель → 502), провайдер `LLM` через `useFactory` + `ConfigService`;
+  - `api/src/config/env.ts` — одна Zod-схема `.env` для Nest і для playground-скриптів;
+  - `api/src/playground` — уроки (`chat.ts`, `weather-agent.ts`, `first-call.ts`), запуск через `tsx`;
+  - `.env` переїхав в `api/.env`; `GET /api/health` замість Hello World.
+  - Перевірено: build, lint (oxlint), unit-тест, curl (health, 400 на невалідне тіло, tool_calls від qwen3:8b, 502 без моделі), playground-скрипт.
+- **Відкриті питання:**
+  - Angular-застосунок `web/` ще не створено.
+- **Далі:** Angular-застосунок `web/` (UI для chat/tool calls/reasoning), потім урок 1.3 (виконання тула).

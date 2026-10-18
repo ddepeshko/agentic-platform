@@ -1,32 +1,16 @@
 {
   "name": "agent-platform",
-  "version": "1.0.0",
-  "description": "",
-  "scripts": {
-    "dev": "tsx watch --env-file=.env src/index.ts",
-    "start": "tsx --env-file=.env src/index.ts",
-    "chat": "tsx --env-file=.env src/playground/chat.ts",
-    "typecheck": "tsc",
-    "lint": "eslint ."
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module",
-  "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "@types/node": "^22.20.5",
-    "eslint": "^10.12.0",
-    "tsx": "^4.23.15",
-    "typescript": "^6.0.3",
-    "typescript-eslint": "^8.71.1"
-  },
   "private": true,
-  "engines": {
-    "node": ">=22"
+  "description": "AI agent platform: NestJS API (api/) + Angular UI (web/)",
+  "scripts": {
+    "api": "npm --prefix api run start:dev",
+    "api:test": "npm --prefix api test",
+    "api:lint": "npm --prefix api run lint",
+    "api:typecheck": "npm --prefix api run typecheck",
+    "chat": "npm --prefix api run playground:chat",
+    "agent": "npm --prefix api run playground:agent"
   },
-  "dependencies": {
-    "openai": "^7.30.1",
-    "zod": "^4.6.5"
+  "engines": {
+    "node": ">=22.22.3"
   }
 }
