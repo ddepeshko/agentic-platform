@@ -1,9 +1,13 @@
+import type { ConfigType } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
+import { appConfig } from './configs/index.js';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api');
-  await app.listen(process.env.PORT ?? 3000);
+    const app = await NestFactory.create(AppModule);
+    const config = app.get<ConfigType<typeof appConfig>>(appConfig.KEY);
+
+    app.setGlobalPrefix(config.prefix);
+    await app.listen(config.port);
 }
 await bootstrap();
