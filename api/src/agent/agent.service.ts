@@ -8,7 +8,6 @@ import { LLM } from './llm.provider.js';
 export class AgentService {
   constructor(@Inject(LLM) private readonly llm: Llm) {}
 
-  // Дефолти для UI: system prompt і тули живуть на бекенді, а не дублюються в браузері
   getPlayground() {
     return {
       model: this.llm.model,

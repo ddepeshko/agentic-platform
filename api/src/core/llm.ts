@@ -1,30 +1,13 @@
 import OpenAI from 'openai';
+import type {
+  ChatMessage,
+  CompletionResult,
+  Llm,
+  LlmSettings,
+  ToolDefinition,
+} from './models/index.js';
 
-// Ядро не знає, звідки береться конфіг (.env, БД, тест).
-// Налаштування передає той, хто створює клієнт: це робить ядро незалежним від платформи.
-export type LlmSettings = {
-  apiKey: string;
-  baseURL: string;
-  model: string;
-};
-
-export type ChatMessage = OpenAI.ChatCompletionMessageParam;
-export type ToolDefinition = OpenAI.ChatCompletionTool;
-
-// Ollama віддає роздуми моделі в полі `reasoning`, якого немає в типах OpenAI SDK.
-export type AssistantMessage = OpenAI.ChatCompletionMessage & {
-  reasoning?: string;
-};
-
-export type CompletionResult = {
-  message: AssistantMessage;
-  finishReason: string | null;
-  usage: OpenAI.CompletionUsage | null;
-  model: string;
-  durationMs: number;
-};
-
-export function createLlm(settings: LlmSettings) {
+export function createLlm(settings: LlmSettings): Llm {
   const client = new OpenAI({
     apiKey: settings.apiKey,
     baseURL: settings.baseURL,
@@ -39,8 +22,7 @@ export function createLlm(settings: LlmSettings) {
     const response = await client.chat.completions.create({
       model: settings.model,
       messages,
-      // Порожній масив tools деякі провайдери відхиляють, тому не передаємо його зовсім
-      ...(tools && tools.length > 0 ? { tools } : {}),
+      ...(tools?.length ? { tools } : {}),
     });
 
     const choice = response.choices[0];
@@ -59,5 +41,3 @@ export function createLlm(settings: LlmSettings) {
 
   return { model: settings.model, complete };
 }
-
-export type Llm = ReturnType<typeof createLlm>;
