@@ -1,0 +1,73 @@
+<mat-toolbar>
+  <h1>Agent Playground</h1>
+  @if (config.hasValue()) {
+    <span class="model">{{ config.value().model }}</span>
+  }
+  <span class="spacer"></span>
+  <button matIconButton matTooltip="Нова розмова" (click)="session.reset()">
+    <mat-icon>add_comment</mat-icon>
+  </button>
+  <button matIconButton matTooltip="Інспектор" (click)="inspectorOpen.set(!inspectorOpen())">
+    <mat-icon>tune</mat-icon>
+  </button>
+</mat-toolbar>
+
+@if (session.loading()) {
+  <mat-progress-bar mode="indeterminate" />
+}
+
+<mat-sidenav-container>
+  <mat-sidenav-content>
+    <main class="chat">
+      <ol class="messages">
+        @for (message of session.messages(); track $index) {
+          <li><app-message-item [message]="message" [index]="$index" /></li>
+        } @empty {
+          <li class="empty">Спитай, наприклад: «Яка погода в Ополе?»</li>
+        }
+      </ol>
+
+      @if (session.waitingForTool()) {
+        <div class="notice" role="status">
+          <span>
+            Модель просить викликати тул (<code>tool_calls</code>). Виконання тулів — урок 1.3.
+          </span>
+          <button matButton (click)="session.removeLastStep()">Прибрати крок</button>
+        </div>
+      }
+
+      @if (session.error(); as message) {
+        <div class="notice notice--error" role="alert">{{ message }}</div>
+      }
+
+      <app-chat-composer
+        [disabled]="session.loading() || session.waitingForTool()"
+        (send)="session.send($event, settings())"
+      />
+    </main>
+  </mat-sidenav-content>
+
+  <mat-sidenav position="end" mode="side" [opened]="inspectorOpen()">
+    <mat-accordion multi>
+      <mat-expansion-panel expanded>
+        <mat-expansion-panel-header>
+          <mat-panel-title>Налаштування</mat-panel-title>
+        </mat-expansion-panel-header>
+        <app-settings-panel
+          [(settings)]="settings"
+          [tools]="config.hasValue() ? config.value().tools : []"
+        />
+      </mat-expansion-panel>
+
+      <mat-expansion-panel expanded>
+        <mat-expansion-panel-header>
+          <mat-panel-title>messages ({{ session.messages().length }})</mat-panel-title>
+        </mat-expansion-panel-header>
+        <app-conversation-inspector
+          [messages]="session.messages()"
+          [lastResult]="session.lastResult()"
+        />
+      </mat-expansion-panel>
+    </mat-accordion>
+  </mat-sidenav>
+</mat-sidenav-container>

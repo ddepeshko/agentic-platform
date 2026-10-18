@@ -1,0 +1,26 @@
+<header class="message__header">
+  <span class="message__role">{{ message().role }}</span>
+  <span class="message__meta">messages[{{ index() }}]</span>
+</header>
+
+@if (reasoning()) {
+  <details class="message__reasoning">
+    <summary>Роздуми моделі (reasoning)</summary>
+    <p>{{ reasoning() }}</p>
+  </details>
+}
+
+@if (message().content) {
+  <p class="message__text">{{ message().content }}</p>
+}
+
+@for (call of toolCalls(); track call.id) {
+  <section class="tool-call">
+    <header class="tool-call__header">
+      <mat-icon>build</mat-icon>
+      <code>{{ call.function.name }}</code>
+      <span class="tool-call__id">{{ call.id }}</span>
+    </header>
+    <pre class="tool-call__args">{{ call.function.arguments }}</pre>
+  </section>
+}
