@@ -1,5 +1,5 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseFilters } from '@nestjs/common';
-import { LlmErrorFilter } from '../../common/filters/index.js';
+import { LlmErrorFilter } from '@common/filters';
 import { AgentService } from './agent.service.js';
 import type { ChatRequestDto } from './dto/chat-request.dto.js';
 import type { ChatResponseDto } from './response/chat.response.dto.js';

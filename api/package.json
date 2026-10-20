@@ -14,9 +14,6 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "oxlint --type-aware src/",
-    "playground:chat": "tsx --env-file=.env src/playground/chat.ts",
-    "playground:agent": "tsx --env-file=.env src/playground/weather-agent.ts",
-    "playground:first-call": "tsx --env-file=.env src/playground/first-call.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -37,7 +34,6 @@
     "oxlint-tsgolint": "^7.0.2001",
     "prettier": "^3.4.2",
     "source-map-support": "^0.5.21",
-    "tsx": "^4.23.15",
     "typescript": "^6.0.2",
     "vite": "^8.0.0"
   }

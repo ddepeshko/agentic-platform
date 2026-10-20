@@ -1,4 +1,4 @@
-import type { ToolDefinition } from '../../../common/interfaces/index.js';
+import type { ToolDefinition } from '@common/interfaces';
 
 export interface PlaygroundResponseDto {
     model: string;

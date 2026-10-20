@@ -1,4 +1,4 @@
-import type { ToolDefinition } from '../../../common/interfaces/index.js';
+import { ToolDefinition } from '@common/interfaces';
 
 export const WEATHER_SYSTEM_PROMPT =
     'Ти агент погоди. Відповідаєш лише на питання про погоду. ' +

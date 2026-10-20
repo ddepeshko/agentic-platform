@@ -10,18 +10,23 @@ src/
 │   ├── interfaces/          ← інтерфейси, по файлу на інтерфейс + barrel
 │   ├── filters/             ← exception filters
 │   └── (пізніше) guards/ interceptors/ decorators/ constants/ enums/ utils/
-├── services/<інтеграція>/   ← обгортки над зовнішніми сервісами: llm, (пізніше) telegram, погодні API
-│   ├── <назва>.module.ts       (@Global, експортує сервіс)
-│   └── <назва>.service.ts
-├── modules/<фіча>/          ← бізнес-модулі
-│   ├── <фіча>.module.ts / .controller.ts / .service.ts
-│   ├── dto/                 ← вхідні дані (interface …Dto)
-│   ├── response/            ← відповіді (interface …ResponseDto)
-│   └── tools/               ← тули агента (поки тут; у модулі 2 — окремий modules/tools/)
-└── playground/              ← уроки, запускаються через tsx без Nest
+└── modules/
+    ├── llm/                 ← клієнт моделі (@Global LlmModule + LlmService)
+    └── agents/              ← бізнес-модуль агентів
+        ├── agent.module.ts / .controller.ts / .service.ts
+        ├── dto/             ← вхідні дані (interface …Dto)
+        ├── response/        ← відповіді (interface …ResponseDto)
+        └── weather/tools/   ← тули агента погоди (у модулі 2 — окремий modules/tools/)
 ```
 
 Зразок — архітектура проєкту CCI (`~/WebstormProjects/cci/api`), оновлена під Nest 12.
+
+## Імпорти й аліаси
+
+- Аліаси в `tsconfig.json` (`paths`): `@common/<папка>` → barrel `src/common/<папка>/index.ts`, `@configs` → `src/configs/index.ts`, `@modules/*` → `src/modules/*`.
+- Між папками — через аліас: `import { LlmErrorFilter } from '@common/filters'`, `import { LlmService } from '@modules/llm/llm.service.js'`.
+- Усередині одного модуля — відносно: `./agent.service.js`.
+- `nest build` переписує аліаси у відносні шляхи в `dist/`, тож `node` запускає збірку без додаткових пакетів. Новий аліас = рядок у `paths`.
 
 ## Конфіг
 
@@ -47,7 +52,7 @@ src/
 ## Підходи
 
 - Без абстрактних базових класів (`AbstractService`, `AbstractController`): спільну логіку виносимо в сервіси й композицію.
-- Сервіси зовнішніх інтеграцій — `@Global()` модулі, щоб не імпортувати їх у кожен модуль.
+- Сервіси зовнішніх інтеграцій (`llm`, пізніше telegram) — `@Global()` модулі в `modules/`, щоб не імпортувати їх у кожен модуль.
 - Логіка agent loop (урок 1.4+) — звичайний TS-клас без декораторів Nest у `modules/agent/runtime/`; Nest-сервіс лише викликає його.
 
 ## Форматування

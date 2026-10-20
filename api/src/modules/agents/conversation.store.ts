@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
-import type { ChatMessage } from '../../common/interfaces/index.js';
+import type { ChatMessage } from '@common/interfaces';
 
 // Поки в пам'яті: після перезапуску сервера розмови зникають. У модулі 4 — таблиці runs / run_steps.
 @Injectable()

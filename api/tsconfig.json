@@ -20,6 +20,17 @@
     "strictPropertyInitialization": false,
     "types": [
       "node"
-    ]
+    ],
+    "paths": {
+      "@common/*": [
+        "./src/common/*/index.ts"
+      ],
+      "@configs": [
+        "./src/configs/index.ts"
+      ],
+      "@modules/*": [
+        "./src/modules/*"
+      ]
+    }
   }
 }

@@ -6,8 +6,6 @@
     "api": "npm --prefix api run start:dev",
     "api:lint": "npm --prefix api run lint",
     "api:typecheck": "npm --prefix api run typecheck",
-    "chat": "npm --prefix api run playground:chat",
-    "agent": "npm --prefix api run playground:agent",
     "web": "npm --prefix web start"
   },
   "engines": {

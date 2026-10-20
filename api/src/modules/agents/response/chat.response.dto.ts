@@ -1,5 +1,5 @@
 import type OpenAI from 'openai';
-import type { ChatMessage } from '../../../common/interfaces/index.js';
+import type { ChatMessage } from '@common/interfaces';
 
 export interface ChatResponseDto {
     conversationId: string;
