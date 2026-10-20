@@ -31,7 +31,7 @@
       @if (context.waitingForTool()) {
         <div class="notice">
           <span>
-            Модель просить викликати тул (<code>tool_calls</code>). Виконання тулів — урок 1.3.
+            Модель знову просить тул (<code>tool_calls</code>). Поки бекенд виконує лише один раунд тулів, цикл — урок 1.4.
           </span>
           <button matButton (click)="context.reset()">Нова розмова</button>
         </div>
