@@ -1,4 +1,4 @@
-import type { ToolDefinition, ToolHandler } from '@common/interfaces';
+import type { ToolDefinition } from '@common/interfaces';
 import type { WeatherResult } from '../interfaces/index.js';
 
 export const WEATHER_SYSTEM_PROMPT =
@@ -9,22 +9,18 @@ export const getWeatherTool: ToolDefinition = {
     type: 'function',
     function: {
         name: 'get_weather',
-        description: 'Повертає поточну погоду (температура, вітер) за географічними координатами.',
+        description:
+            'Повертає поточну погоду за координатами: температуру (°C) і швидкість вітру (км/год). Прогнозу не дає. ' +
+            'Координати бери з результату get_geo_code, не вгадуй їх.',
         parameters: {
             type: 'object',
             properties: {
-                latitude: { type: 'number', description: 'Широта, від -90 до 90' },
-                longitude: { type: 'number', description: 'Довгота, від -180 до 180' },
+                latitude: { type: 'number', description: 'Широта в градусах, від -90 до 90, напр. 50.45' },
+                longitude: { type: 'number', description: 'Довгота в градусах, від -180 до 180, напр. 30.52' },
             },
             required: ['latitude', 'longitude'],
         },
     },
-};
-
-export const weatherTools: ToolDefinition[] = [getWeatherTool];
-
-export const weatherToolHandlers: Record<string, ToolHandler> = {
-    get_weather: (args) => getWeather(Number(args.latitude), Number(args.longitude)),
 };
 
 export async function getWeather(latitude: number, longitude: number): Promise<WeatherResult> {

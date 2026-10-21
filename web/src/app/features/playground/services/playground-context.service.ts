@@ -24,8 +24,8 @@ export class PlaygroundContextService {
   public loading = signal(false);
   public error = signal('');
 
-  public waitingForTool = computed(() => this.lastResult()?.finishReason === 'tool_calls');
-  public canSend = computed(() => !this.loading() && !this.waitingForTool());
+  public stoppedByLimit = computed(() => this.lastResult()?.stopReason === 'max_steps');
+  public canSend = computed(() => !this.loading());
 
   public async send(text: string) {
     this.pendingText.set(text);

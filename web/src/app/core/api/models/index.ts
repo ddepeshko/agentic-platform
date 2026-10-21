@@ -3,6 +3,7 @@ export type { ChatMessage } from './chat-message';
 export type { ChatRequest } from './chat-request';
 export type { ChatResponse } from './chat-response';
 export type { PlaygroundConfig } from './playground-config';
+export type { StopReason } from './stop-reason';
 export type { SystemMessage } from './system-message';
 export type { ToolCall } from './tool-call';
 export type { ToolDefinition } from './tool-definition';
