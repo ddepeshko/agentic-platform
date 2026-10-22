@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { LlmService } from '@modules/llm/llm.service.js';
 import { ConversationStore } from './conversation.store.js';
 import type { ChatRequestDto } from './dto/chat-request.dto.js';
@@ -33,7 +33,7 @@ export class AgentService {
 
         this.conversations.append(id, { role: 'user', content: message });
 
-        const runner = new AgentRunner(this.llmService, {
+        const runner = new AgentRunner(this.llmService, new Logger(AgentRunner.name), {
             tools: useTools ? weatherTools : undefined,
             handlers: weatherToolHandlers,
             maxSteps: MAX_STEPS,
