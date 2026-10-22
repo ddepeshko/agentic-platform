@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { ConfigType } from '@nestjs/config';
 import OpenAI from 'openai';
-import type { ChatMessage, CompletionResult, ToolDefinition } from '@common/interfaces';
+import type { CompletionResult, ConversationParameters } from '@common/interfaces';
 import { llmConfig } from '@configs';
 
 @Injectable()
@@ -16,13 +16,14 @@ export class LlmService {
         return this.config.model;
     }
 
-    public async createConversation(messages: ChatMessage[], tools?: ToolDefinition[]): Promise<CompletionResult> {
+    public async createConversation(options: ConversationParameters): Promise<CompletionResult> {
         const startedAt = Date.now();
 
         const response = await this.client.chat.completions.create({
             model: this.config.model,
-            messages,
-            ...(tools?.length ? { tools } : {}),
+            messages: options.messages,
+            ...(options.tools?.length ? { tools: options.tools } : {}),
+            ...(options.responseFormat ? { response_format: options.responseFormat } : {}),
         });
 
         const choice = response.choices[0];

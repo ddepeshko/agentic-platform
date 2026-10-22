@@ -1,7 +1,7 @@
 import type { LoggerService } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import type OpenAI from 'openai';
-import type { AssistantMessage, ChatMessage, CompletionResult } from '@common/interfaces';
+import type { AssistantMessage, ChatMessage, CompletionResult, ConversationParameters } from '@common/interfaces';
 import type { LlmService } from '@modules/llm/llm.service.js';
 import type { StopReason } from '../interfaces/index.js';
 import type { AgentRunOptions, AgentRunResult } from './interfaces/index.js';
@@ -38,8 +38,9 @@ export class AgentRunner {
             step++;
         }
 
+        const output =
+            stopReason === 'completed' && this.options.responseFormat ? await this.formatAnswer(history) : undefined;
         this.logFinish(stopReason);
-
         return {
             messages: this.messages,
             finishReason: result.finishReason,
@@ -47,21 +48,28 @@ export class AgentRunner {
             usage: this.usage,
             model: result.model,
             durationMs: this.durationMs,
+            output,
         };
     }
 
     private async complete(history: ChatMessage[]): Promise<CompletionResult> {
-        const result = await this.llmService.createConversation([...history, ...this.messages], this.options.tools);
-        const { message, usage, durationMs } = result;
-        this.messages.push(message);
+        const conversationOptions: ConversationParameters = {
+            messages: [...history, ...this.messages],
+            tools: this.options.tools,
+        };
+        const result = await this.llmService.createConversation(conversationOptions);
+        this.messages.push(result.message);
+        this.track(result);
 
+        return result;
+    }
+
+    private track({ usage, durationMs }: CompletionResult): void {
         this.usage.prompt_tokens += usage?.prompt_tokens ?? 0;
         this.usage.completion_tokens += usage?.completion_tokens ?? 0;
         this.usage.total_tokens += usage?.total_tokens ?? 0;
         this.durationMs += durationMs;
         this.llmCalls++;
-
-        return result;
     }
 
     private async answerToolCalls(message: AssistantMessage, limitReached: boolean): Promise<void> {
@@ -89,6 +97,20 @@ export class AgentRunner {
             const reason = error instanceof Error ? error.message : String(error);
             return `Tool error: ${reason}`;
         }
+    }
+
+    private async formatAnswer(history: ChatMessage[]): Promise<unknown> {
+        const result = await this.llmService.createConversation({
+            messages: [
+                ...history,
+                ...this.messages,
+                { role: 'user', content: 'Оформи свою останню відповідь у JSON за схемою.' },
+            ],
+            responseFormat: this.options.responseFormat,
+        });
+        this.track(result);
+
+        return JSON.parse(result.message.content ?? '');
     }
 
     private logFinish(stopReason: StopReason): void {

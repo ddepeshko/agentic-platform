@@ -9,4 +9,5 @@ export interface AgentRunResult {
     usage: OpenAI.CompletionUsage;
     model: string;
     durationMs: number;
+    output?: unknown;
 }

@@ -10,4 +10,5 @@ export interface ChatResponseDto {
     usage: OpenAI.CompletionUsage | null;
     model: string;
     durationMs: number;
+    output?: unknown;
 }
