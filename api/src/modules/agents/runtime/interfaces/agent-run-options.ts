@@ -5,4 +5,5 @@ export interface AgentRunOptions {
     handlers: Record<string, ToolHandler>;
     maxSteps: number;
     responseFormat?: ResponseFormat;
+    scope: string;
 }

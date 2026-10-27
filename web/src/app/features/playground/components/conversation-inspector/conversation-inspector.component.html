@@ -1,8 +1,12 @@
 @if (context.lastResult(); as result) {
   <mat-list>
     <mat-list-item>
+      <span matListItemTitle>{{ result.stopReason }}</span>
+      <span matListItemLine>stop_reason (статус запуску агента)</span>
+    </mat-list-item>
+    <mat-list-item>
       <span matListItemTitle>{{ result.finishReason }}</span>
-      <span matListItemLine>finish_reason</span>
+      <span matListItemLine>finish_reason (останній виклик моделі)</span>
     </mat-list-item>
     <mat-list-item>
       <span matListItemTitle>

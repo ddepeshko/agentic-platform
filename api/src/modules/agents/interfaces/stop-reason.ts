@@ -1,1 +1,1 @@
-export type StopReason = 'completed' | 'max_steps';
+export type StopReason = 'completed' | 'max_steps' | 'out_of_scope';

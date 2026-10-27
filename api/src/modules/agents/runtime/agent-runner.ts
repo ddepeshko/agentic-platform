@@ -4,9 +4,9 @@ import type OpenAI from 'openai';
 import type { AssistantMessage, ChatMessage, CompletionResult, ConversationParameters } from '@common/interfaces';
 import type { LlmService } from '@modules/llm/llm.service.js';
 import type { StopReason } from '../interfaces/index.js';
-import type { AgentRunOptions, AgentRunResult } from './interfaces/index.js';
+import type { AgentRunOptions, AgentRunResult, ScopeCheck } from './interfaces/index.js';
+import { scopeCheckFormat } from './formats/index.js';
 
-// На запуск — один підсумковий рядок; окремо лише warn про помилки тулів. Тексти повідомлень не логуємо.
 export class AgentRunner {
     private readonly id = randomUUID().slice(0, 8);
     private readonly messages: ChatMessage[] = [];
@@ -21,6 +21,11 @@ export class AgentRunner {
     ) {}
 
     public async run(history: ChatMessage[]): Promise<AgentRunResult> {
+        const outOfScope = await this.stopIfOutOfScope(history);
+        if (outOfScope) {
+            return outOfScope;
+        }
+
         let result = await this.complete(history);
         let stopReason: StopReason = 'completed';
         let step = 0;
@@ -99,6 +104,26 @@ export class AgentRunner {
         }
     }
 
+    private async checkScope(history: ChatMessage[]): Promise<CompletionResult> {
+        const dialogue = history.filter(
+            (message) => message.role === 'user' || (message.role === 'assistant' && message.content),
+        );
+        const result = await this.llmService.createConversation({
+            messages: [
+                {
+                    role: 'system',
+                    content:
+                        'Ти перевіряєш, чи запит користувача належить до зони відповідальності агента. ' +
+                        `Зона агента: ${this.options.scope}`,
+                },
+                ...dialogue,
+            ],
+            responseFormat: scopeCheckFormat,
+        });
+        this.track(result);
+        return result;
+    }
+
     private async formatAnswer(history: ChatMessage[]): Promise<unknown> {
         const result = await this.llmService.createConversation({
             messages: [
@@ -119,5 +144,23 @@ export class AgentRunner {
             `${this.durationMs}ms, ${this.usage.total_tokens} tokens`;
 
         this.logger.log(summary);
+    }
+
+    private async stopIfOutOfScope(history: ChatMessage[]): Promise<AgentRunResult | null> {
+        const result = await this.checkScope(history);
+        const scopeCheck: ScopeCheck = JSON.parse(result.message.content ?? '');
+        if (!scopeCheck.inScope) {
+            this.messages.push({ role: 'assistant', content: scopeCheck.reply });
+            this.logFinish('out_of_scope');
+            return {
+                messages: this.messages,
+                finishReason: result.finishReason,
+                stopReason: 'out_of_scope',
+                usage: this.usage,
+                model: result.model,
+                durationMs: this.durationMs,
+            };
+        }
+        return null;
     }
 }
