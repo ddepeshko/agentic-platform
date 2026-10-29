@@ -59,7 +59,7 @@ export class AgentRunner {
 
     private async complete(history: ChatMessage[]): Promise<CompletionResult> {
         const conversationOptions: ConversationParameters = {
-            messages: [...history, ...this.messages],
+            messages: [...this.compactHistory(history), ...this.messages],
             tools: this.options.tools,
         };
         const result = await this.llmService.createConversation(conversationOptions);
@@ -105,9 +105,7 @@ export class AgentRunner {
     }
 
     private async checkScope(history: ChatMessage[]): Promise<CompletionResult> {
-        const dialogue = history.filter(
-            (message) => message.role === 'user' || (message.role === 'assistant' && message.content),
-        );
+        const dialogue = this.compactHistory(history).filter((message) => message.role !== 'system');
         const result = await this.llmService.createConversation({
             messages: [
                 {
@@ -127,7 +125,7 @@ export class AgentRunner {
     private async formatAnswer(history: ChatMessage[]): Promise<unknown> {
         const result = await this.llmService.createConversation({
             messages: [
-                ...history,
+                ...this.compactHistory(history),
                 ...this.messages,
                 { role: 'user', content: 'Оформи свою останню відповідь у JSON за схемою.' },
             ],
@@ -162,5 +160,17 @@ export class AgentRunner {
             };
         }
         return null;
+    }
+
+    private compactHistory(history: ChatMessage[]): ChatMessage[] {
+        return history.filter((message) => {
+            if (['system', 'user'].includes(message.role)) {
+                return true;
+            }
+            if (message.role === 'assistant') {
+                return !message.tool_calls?.length;
+            }
+            return false;
+        });
     }
 }
