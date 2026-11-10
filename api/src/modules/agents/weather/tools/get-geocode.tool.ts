@@ -1,5 +1,5 @@
 import type { ToolDefinition } from '@common/interfaces';
-import { AddressLocation } from '@modules/agents/weather/interfaces/index.js';
+import type { GeoLocation } from '../interfaces/index.js';
 
 export const getGeocodeTool: ToolDefinition = {
     type: 'function',
@@ -23,17 +23,21 @@ export const getGeocodeTool: ToolDefinition = {
     },
 };
 
-export async function getLocationByAddressName(locationName: string): Promise<AddressLocation> {
-    const result = await fetch(
-        `https://geocoding-api.open-meteo.com/v1/search?name=${locationName}&count=1&language=uk`,
-    );
-    const data = await result.json();
-    const [locationData] = data.results;
-    if (!locationData) {
-        throw new Error(`Location ${locationName} not found. Please try an other location`);
+export async function getLocationByAddressName(locationName: string): Promise<GeoLocation> {
+    const params = new URLSearchParams({ name: locationName, count: '1', language: 'uk' });
+    const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?${params}`);
+    const data = await response.json();
+    if (!response.ok) throw new Error(`Open-Meteo geocoding ${response.status}: ${data.reason}`);
+
+    const location = data.results?.[0];
+    if (!location) {
+        throw new Error(`Місто «${locationName}» не знайдено. Спробуй іншу форму назви або латиницею.`);
     }
+
     return {
-        latitude: locationData.latitude,
-        longitude: locationData.longitude,
+        name: location.name,
+        country: location.country,
+        latitude: location.latitude,
+        longitude: location.longitude,
     };
 }

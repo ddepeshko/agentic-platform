@@ -6,9 +6,8 @@ import type { ChatResponseDto } from './response/chat.response.dto.js';
 import type { PlaygroundResponseDto } from './response/playground.response.dto.js';
 import { AgentRunner } from './runtime/agent-runner.js';
 import { weatherToolHandlers } from './weather/handlers/index.js';
-import { WEATHER_SCOPE, WEATHER_SYSTEM_PROMPT } from './weather/tools/index.js';
-import { weatherTools } from './weather/tools/tool-combainer.js';
-import type { AgentRunOptions } from '@modules/agents/runtime/interfaces/index.js';
+import { WEATHER_SCOPE, WEATHER_SYSTEM_PROMPT, weatherTools } from './weather/tools/index.js';
+import type { AgentRunOptions } from './runtime/interfaces/index.js';
 
 const MAX_STEPS = 5;
 
