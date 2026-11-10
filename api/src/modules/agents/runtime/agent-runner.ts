@@ -16,6 +16,7 @@ export class AgentRunner {
     private readonly usage: OpenAI.CompletionUsage = { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
     private durationMs = 0;
     private llmCalls = 0;
+    private contextTokens = 0;
 
     constructor(
         private readonly llmService: LlmService,
@@ -56,6 +57,8 @@ export class AgentRunner {
             usage: this.usage,
             model: result.model,
             durationMs: this.durationMs,
+            contextTokens: this.contextTokens,
+            contextWindow: this.options.contextWindow,
             output,
         };
     }
@@ -77,6 +80,7 @@ export class AgentRunner {
         this.usage.completion_tokens += usage?.completion_tokens ?? 0;
         this.usage.total_tokens += usage?.total_tokens ?? 0;
         this.durationMs += durationMs;
+        this.contextTokens = Math.max(this.contextTokens, usage?.prompt_tokens ?? 0);
         this.llmCalls++;
     }
 
@@ -160,6 +164,8 @@ export class AgentRunner {
                 usage: this.usage,
                 model: result.model,
                 durationMs: this.durationMs,
+                contextTokens: this.contextTokens,
+                contextWindow: this.options.contextWindow,
             };
         }
         return null;

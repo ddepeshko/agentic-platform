@@ -12,7 +12,14 @@
       <span matListItemTitle>
         {{ result.usage?.prompt_tokens ?? '—' }} / {{ result.usage?.completion_tokens ?? '—' }}
       </span>
-      <span matListItemLine>prompt / completion tokens</span>
+      <span matListItemLine>prompt / completion tokens (сума за хід)</span>
+    </mat-list-item>
+    <mat-list-item lines="3">
+      <span matListItemTitle>{{ result.contextTokens }} / {{ result.contextWindow }}</span>
+      <span matListItemLine>контекст (найбільший запит за хід)</span>
+      <div matListItemLine>
+        <mat-progress-bar mode="determinate" [value]="contextPercent()" />
+      </div>
     </mat-list-item>
     <mat-list-item>
       <span matListItemTitle>{{ result.durationMs }} мс</span>

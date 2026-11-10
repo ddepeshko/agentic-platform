@@ -9,5 +9,7 @@ export interface ChatResponse {
   stopReason: StopReason;
   usage: Usage | null;
   model: string;
+  contextTokens: number;
+  contextWindow: number;
   durationMs: number;
 }

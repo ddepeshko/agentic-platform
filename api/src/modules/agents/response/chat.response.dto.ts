@@ -9,6 +9,8 @@ export interface ChatResponseDto {
     stopReason: StopReason;
     usage: OpenAI.CompletionUsage | null;
     model: string;
+    contextTokens: number;
+    contextWindow: number;
     durationMs: number;
     output?: unknown;
 }
