@@ -16,6 +16,10 @@ export class LlmService {
         return this.config.model;
     }
 
+    public get contextWindow(): number {
+        return this.config.contextWindow;
+    }
+
     public async createConversation(options: ConversationParameters): Promise<CompletionResult> {
         const startedAt = Date.now();
 

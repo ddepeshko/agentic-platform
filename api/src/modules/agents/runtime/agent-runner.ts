@@ -6,6 +6,9 @@ import type { LlmService } from '@modules/llm/llm.service.js';
 import type { StopReason } from '../interfaces/index.js';
 import type { AgentRunOptions, AgentRunResult, ScopeCheck } from './interfaces/index.js';
 import { scopeCheckFormat } from './formats/index.js';
+import { estimateTokens } from '@common/utils';
+
+const ANSWER_RESERVE = 1000;
 
 export class AgentRunner {
     private readonly id = randomUUID().slice(0, 8);
@@ -59,7 +62,7 @@ export class AgentRunner {
 
     private async complete(history: ChatMessage[]): Promise<CompletionResult> {
         const conversationOptions: ConversationParameters = {
-            messages: [...this.compactHistory(history), ...this.messages],
+            messages: [...this.fitToBudget(this.compactHistory(history)), ...this.messages],
             tools: this.options.tools,
         };
         const result = await this.llmService.createConversation(conversationOptions);
@@ -172,5 +175,42 @@ export class AgentRunner {
             }
             return false;
         });
+    }
+
+    // Обрізаємо цілими ходами від найстарішого; system і поточне питання (останній хід) лишаються завжди
+    private fitToBudget(history: ChatMessage[]): ChatMessage[] {
+        const system = history.filter((message) => message.role === 'system');
+        const turns = this.splitIntoTurns(history.filter((message) => message.role !== 'system'));
+        const budget = this.historyBudget(system);
+
+        while (turns.length > 1 && estimateTokens(turns) > budget) {
+            turns.shift();
+        }
+
+        return [...system, ...turns.flat()];
+    }
+
+    private historyBudget(system: ChatMessage[]): number {
+        const reserved =
+            ANSWER_RESERVE +
+            estimateTokens(system) +
+            estimateTokens(this.options.tools ?? []) +
+            estimateTokens(this.messages);
+
+        return this.options.contextWindow - reserved;
+    }
+
+    // Хід — питання користувача і все, що після нього до наступного питання
+    private splitIntoTurns(messages: ChatMessage[]): ChatMessage[][] {
+        const turns: ChatMessage[][] = [];
+        for (const message of messages) {
+            const lastTurn = turns.at(-1);
+            if (message.role === 'user' || !lastTurn) {
+                turns.push([message]);
+            } else {
+                lastTurn.push(message);
+            }
+        }
+        return turns;
     }
 }

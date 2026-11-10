@@ -48,6 +48,7 @@ export class AgentService {
             handlers: weatherToolHandlers,
             maxSteps: MAX_STEPS,
             scope: WEATHER_SCOPE,
+            contextWindow: this.llmService.contextWindow,
         };
     }
 }

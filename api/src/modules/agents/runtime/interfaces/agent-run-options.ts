@@ -6,4 +6,5 @@ export interface AgentRunOptions {
     maxSteps: number;
     responseFormat?: ResponseFormat;
     scope: string;
+    contextWindow: number;
 }
