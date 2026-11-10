@@ -177,7 +177,6 @@ export class AgentRunner {
         });
     }
 
-    // Обрізаємо цілими ходами від найстарішого; system і поточне питання (останній хід) лишаються завжди
     private fitToBudget(history: ChatMessage[]): ChatMessage[] {
         const system = history.filter((message) => message.role === 'system');
         const turns = this.splitIntoTurns(history.filter((message) => message.role !== 'system'));
@@ -200,7 +199,6 @@ export class AgentRunner {
         return this.options.contextWindow - reserved;
     }
 
-    // Хід — питання користувача і все, що після нього до наступного питання
     private splitIntoTurns(messages: ChatMessage[]): ChatMessage[][] {
         const turns: ChatMessage[][] = [];
         for (const message of messages) {
