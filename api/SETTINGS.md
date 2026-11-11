@@ -12,11 +12,15 @@ src/
 │   └── (пізніше) guards/ interceptors/ decorators/ constants/ enums/ utils/
 └── modules/
     ├── llm/                 ← клієнт моделі (@Global LlmModule + LlmService)
+    ├── tools/               ← тули платформи; не належать агентам
+    │   ├── interfaces/      ← контракт Tool, RiskLevel
+    │   └── <домен>/         ← <назва>.tool.ts: один тул = один об'єкт Tool = один файл
     └── agents/              ← бізнес-модуль агентів
         ├── agent.module.ts / .controller.ts / .service.ts
         ├── dto/             ← вхідні дані (interface …Dto)
         ├── response/        ← відповіді (interface …ResponseDto)
-        └── weather/tools/   ← тули агента погоди (у модулі 2 — окремий modules/tools/)
+        ├── runtime/         ← AgentRunner: цикл агента, без Nest і без знання про конкретні тули
+        └── <агент>/         ← <агент>.agent.ts: промпт, зона, список тулів
 ```
 
 Зразок — архітектура проєкту CCI (`~/WebstormProjects/cci/api`), оновлена під Nest 12.
@@ -53,7 +57,8 @@ src/
 
 - Без абстрактних базових класів (`AbstractService`, `AbstractController`): спільну логіку виносимо в сервіси й композицію.
 - Сервіси зовнішніх інтеграцій (`llm`, пізніше telegram) — `@Global()` модулі в `modules/`, щоб не імпортувати їх у кожен модуль.
-- Логіка agent loop (урок 1.4+) — звичайний TS-клас без декораторів Nest у `modules/agent/runtime/`; Nest-сервіс лише викликає його.
+- Логіка agent loop — звичайний TS-клас без декораторів Nest (`modules/agents/runtime/AgentRunner`); Nest-сервіс лише викликає його.
+- Тул — об'єкт за контрактом `Tool` (`name`, `description`, `parameters`, `execute`, `readOnly`, `riskLevel`, `owner`); опис для моделі будується з нього (`toToolDefinition`), назва тула записується один раз.
 
 ## Форматування
 

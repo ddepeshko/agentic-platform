@@ -5,8 +5,8 @@ import type { ChatRequestDto } from './dto/chat-request.dto.js';
 import type { ChatResponseDto } from './response/chat.response.dto.js';
 import type { PlaygroundResponseDto } from './response/playground.response.dto.js';
 import { AgentRunner } from './runtime/agent-runner.js';
-import { weatherToolHandlers } from './weather/handlers/index.js';
-import { WEATHER_SCOPE, WEATHER_SYSTEM_PROMPT, weatherTools } from './weather/tools/index.js';
+import { toToolDefinition } from '@modules/tools/index.js';
+import { WEATHER_SCOPE, WEATHER_SYSTEM_PROMPT, WEATHER_TOOLS } from './weather/weather.agent.js';
 import type { AgentRunOptions } from './runtime/interfaces/index.js';
 
 const MAX_STEPS = 5;
@@ -21,7 +21,7 @@ export class AgentService {
     public getPlayground(): PlaygroundResponseDto {
         return {
             model: this.llmService.model,
-            tools: weatherTools,
+            tools: WEATHER_TOOLS.map(toToolDefinition),
         };
     }
 
@@ -43,8 +43,8 @@ export class AgentService {
 
     private getRunnerConfig(useTools: boolean | undefined): AgentRunOptions {
         return {
-            tools: useTools ? weatherTools : undefined,
-            handlers: weatherToolHandlers,
+            tools: useTools ? WEATHER_TOOLS.map(toToolDefinition) : undefined,
+            handlers: Object.fromEntries(WEATHER_TOOLS.map((tool) => [tool.name, tool.execute])),
             maxSteps: MAX_STEPS,
             scope: WEATHER_SCOPE,
             contextWindow: this.llmService.contextWindow,
